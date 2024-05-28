@@ -14,13 +14,14 @@ import MeasurePointsButton from "../buttons/measurePointsButton/MeasurePointsBut
 import ShowCenterGridButton from "../buttons/showCenterGridButton/ShowCenterGridButton";
 import MessageButton from "../buttons/messageButton/MessageButton";
 import TeamButton from "../buttons/teamButton/TeamButton";
-import useLocation from "../../hooks/useLocation/useLocation";
-import { LLtoMGRS } from "../../utils/utils";
+import { useTeamChatContext } from "../../context/teamChatContext/TeamChatContext";
+import { MaterialIcons } from "@expo/vector-icons";
+import ShowCurrentGridButton from "../buttons/showCurrentGridButton/ShowCurrentGridButton";
 
 const TopBar = () => {
   const { activeMission, activeTeam } = useActiveMission();
 
-  const { location } = useLocation();
+  const { teamChatConnected } = useTeamChatContext();
 
   const [orientation, setOrientation] = useState<"LANDSCAPE" | "PORTRAIT">(
     "LANDSCAPE"
@@ -49,50 +50,32 @@ const TopBar = () => {
       <AddPointButton />
       <GetCoordinateButton />
       <MeasurePointsButton />
-      <ShowCenterGridButton />
       <MessageButton />
       <TeamButton />
+      <ShowCurrentGridButton />
+      <ShowCenterGridButton />
       <HelpButton />
-      <View>
-        {location && (
-          <View>
-            <Text>
-              ACC:{" "}
-              {location.coords.altitudeAccuracy
-                ? `+/- ${Math.trunc(location.coords.altitudeAccuracy)} m`
-                : "None"}
-            </Text>
-            <Text>
-              ALT:{" "}
-              {location.coords.altitude
-                ? `${Math.trunc(location.coords.altitude)} m`
-                : "N/A"}
-            </Text>
-            <Text>
-              Heading:{" "}
-              {location.coords.heading
-                ? `${Math.trunc(location.coords.heading)}°`
-                : "None"}
-            </Text>
-            <Text>
-              {LLtoMGRS({
-                latitude: location.coords.latitude,
-                longitude: location.coords.longitude,
-              })}
-            </Text>
-          </View>
-        )}
-      </View>
       <View
-        style={{ flexDirection: "row", flex: 1, justifyContent: "flex-end" }}
+        style={{
+          flexDirection: "row",
+          flex: 1,
+          justifyContent: "flex-end",
+        }}
       >
-        <View style={s.missionDetails}>
-          <Text>
-            Mission: {activeMission?.name ? activeMission.name : "NONE"}
-          </Text>
-          <Text>Team: {activeTeam?.name ? activeTeam.name : "NONE"}</Text>
+        <View style={s.topBarInfoContainer}>
+          {/* <View>
+            <Text>{activeMission?.name ? activeMission.name : "NONE"}</Text>
+            <Text>{activeTeam?.name ? activeTeam.name : "NONE"}</Text>
+          </View> */}
+          <Time />
+          <View style={{ paddingHorizontal: 4, justifyContent: "center" }}>
+            <MaterialIcons
+              name="connect-without-contact"
+              size={24}
+              color={teamChatConnected ? COLORS.lime[500] : COLORS.red[600]}
+            />
+          </View>
         </View>
-        <Time />
       </View>
     </View>
   );
@@ -109,10 +92,12 @@ const s = StyleSheet.create({
     borderBottomWidth: 1,
     borderBottomColor: COLORS.gray[700],
   },
-  missionDetails: {
+  topBarInfoContainer: {
     backgroundColor: COLORS.gray[900],
-    padding: 4,
+    paddingVertical: 4,
     paddingHorizontal: 8,
     borderRadius: 4,
+    flexDirection: "row",
+    gap: 8,
   },
 });

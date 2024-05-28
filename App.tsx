@@ -25,6 +25,7 @@ import ActiveMissionContextProvider from "./context/activeMissionContext/ActiveM
 import MapStateContextProvider from "./context/mapState/MapStateContext";
 import MapGraphicsContextProvider from "./context/mapGraphics/MapGraphicsContext";
 import RegisterScreen from "./screens/registerScreen/RegisterScreen";
+import TeamChatContextProvider from "./context/teamChatContext/TeamChatContext";
 
 export type RootStackParamList = {
   homeScreen: undefined;
@@ -138,12 +139,14 @@ export default function App() {
         <AuthContextProvider>
           <ActiveMissionContextProvider>
             <MapStateContextProvider>
-              <MapGraphicsContextProvider>
-                <ButtonHelpContextProvider>
-                  <RenderedStack />
-                  <ButtonHelpModal />
-                </ButtonHelpContextProvider>
-              </MapGraphicsContextProvider>
+              <TeamChatContextProvider>
+                <MapGraphicsContextProvider>
+                  <ButtonHelpContextProvider>
+                    <RenderedStack />
+                    <ButtonHelpModal />
+                  </ButtonHelpContextProvider>
+                </MapGraphicsContextProvider>
+              </TeamChatContextProvider>
             </MapStateContextProvider>
           </ActiveMissionContextProvider>
         </AuthContextProvider>

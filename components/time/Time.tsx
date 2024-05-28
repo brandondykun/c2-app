@@ -18,7 +18,7 @@ const Time = () => {
   const split = time.split(", ");
 
   return (
-    <View>
+    <View style={{ paddingHorizontal: 6, justifyContent: "center" }}>
       <Text>{split[0]}</Text>
       <Text>{split[1]}</Text>
     </View>

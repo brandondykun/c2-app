@@ -9,7 +9,7 @@ type MapState =
   | "MEASURE_POINTS"
   | null;
 
-type ActiveMenu =
+export type ActiveMenu =
   | "ADD_POINT"
   | "POINT_DETAILS"
   | "VIEW_LAYERS"
@@ -28,6 +28,7 @@ export type MapReducerState = {
   measurePointOne: Coordinate | null;
   measurePointTwo: Coordinate | null;
   showCenterGrid: boolean;
+  showCurrentGrid: boolean;
 };
 
 export type MapStateReducerAction =
@@ -57,6 +58,7 @@ export type MapStateReducerAction =
   | { type: "SET_MEASURE_POINT_TWO"; payload: Coordinate }
   | { type: "CANCEL_POINTS_MEASURE" }
   | { type: "TOGGLE_SHOW_CENTER_GRID_BUTTON" }
+  | { type: "TOGGLE_SHOW_CURRENT_GRID" }
   | { type: "TOGGLE_MESSAGES" }
   | { type: "TOGGLE_TEAM_MENU" };
 
@@ -69,6 +71,7 @@ export const mapReducerInitialState = {
   measurePointOne: null,
   measurePointTwo: null,
   showCenterGrid: false,
+  showCurrentGrid: false,
 };
 
 export const mapStateReducer = (
@@ -309,6 +312,12 @@ export const mapStateReducer = (
       return {
         ...state,
         activeMenu: "MESSAGES",
+      };
+    }
+    case "TOGGLE_SHOW_CURRENT_GRID": {
+      return {
+        ...state,
+        showCurrentGrid: !state.showCurrentGrid,
       };
     }
     default: {
