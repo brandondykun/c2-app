@@ -7,7 +7,8 @@ export type HelpModalVariants =
   | "GET_COORDINATE"
   | "MEASURE_POINTS"
   | "SHOW_CENTER_GRID"
-  | "TEAMS";
+  | "TEAMS"
+  | "SHOW_CURRENT_GRID";
 
 export type Tokens = {
   access: string;
@@ -109,4 +110,11 @@ export type MissionGraphics = {
   id: number;
   name: string;
   mission_points: BackendPoint[];
+};
+
+export type TeamMessage = {
+  text: string;
+  sender: Profile;
+  team: number;
+  id: number;
 };

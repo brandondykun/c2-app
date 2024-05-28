@@ -35,6 +35,10 @@ function ButtonHelpContextProvider({ children }: Props) {
       setModalText("Toggle center grid indicator.");
     } else if (type === "TEAMS") {
       setModalText("View members of your current team.");
+    } else if (type === "SHOW_CURRENT_GRID") {
+      setModalText(
+        "Toggle current grid display. This will display your grid and altitude."
+      );
     }
     setModalVisible(true);
   }, []);

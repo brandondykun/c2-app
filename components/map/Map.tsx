@@ -8,10 +8,10 @@ import { Coordinate, Point } from "../../types/types";
 import CustomMapMarker from "../customMapMarker/CustomMapMarker";
 import { getInitialRegion } from "../../utils/utils";
 import { Entypo, AntDesign, MaterialIcons } from "@expo/vector-icons";
-import { useRef, useState } from "react";
-import Text from "../ui/text/Text";
+import { useState } from "react";
 import CenterCoordinatePreview from "../centerCoordinatePreview/CenterCoordinatePreview";
 import useLocation from "../../hooks/useLocation/useLocation";
+import CurrentGridDisplay from "../currentGridDisplay/CurrentGridDisplay";
 
 const TempCoordinate = () => {
   const { state, dispatch } = useMapState();
@@ -40,23 +40,11 @@ const TempCoordinate = () => {
 };
 
 const MeasurePointOne = () => {
-  const { state, dispatch } = useMapState();
+  const { state } = useMapState();
 
   if (state.measurePointOne) {
     return (
-      <Marker
-        coordinate={state.measurePointOne}
-        // draggable
-        // onDragStart={() => {
-        //   Haptics.selectionAsync();
-        // }}
-        // onDrag={(e) => {
-        //   dispatch({
-        //     type: "SET_MEASURE_POINT_ONE",
-        //     payload: e.nativeEvent.coordinate,
-        //   });
-        // }}
-      >
+      <Marker coordinate={state.measurePointOne}>
         <AntDesign name="plus" size={24} color={COLORS.red[500]} />
       </Marker>
     );
@@ -66,23 +54,11 @@ const MeasurePointOne = () => {
 };
 
 const MeasurePointTwo = () => {
-  const { state, dispatch } = useMapState();
+  const { state } = useMapState();
 
   if (state.measurePointTwo) {
     return (
-      <Marker
-        coordinate={state.measurePointTwo}
-        // draggable
-        // onDragStart={() => {
-        //   Haptics.selectionAsync();
-        // }}
-        // onDrag={(e) => {
-        //   dispatch({
-        //     type: "SET_MEASURE_POINT_TWO",
-        //     payload: e.nativeEvent.coordinate,
-        //   });
-        // }}
-      >
+      <Marker coordinate={state.measurePointTwo}>
         <AntDesign name="plus" size={24} color={COLORS.red[500]} />
       </Marker>
     );
@@ -216,12 +192,6 @@ const Map = () => {
   const { points } = useMapGraphics();
   const initialRegion = getInitialRegion(points);
 
-  // const [centerCoord, setCenterCoord] = useState(
-  //   `${initialRegion ? initialRegion?.latitude : 0}, ${
-  //     initialRegion ? initialRegion?.longitude : 0
-  //   }`
-  // );
-
   const [centerCoord, setCenterCoord] = useState<Coordinate>({
     latitude: initialRegion ? initialRegion?.latitude : 0,
     longitude: initialRegion ? initialRegion?.longitude : 0,
@@ -231,7 +201,6 @@ const Map = () => {
     <View style={s.root}>
       <MapView
         style={s.map}
-        // showsUserLocation
         mapType="satellite"
         onPress={(e) => onMapPress(e)}
         initialRegion={initialRegion}
@@ -262,6 +231,7 @@ const Map = () => {
             })}
         <UsersLocation />
       </MapView>
+      {state.showCurrentGrid && <CurrentGridDisplay />}
       {state.showCenterGrid && (
         <>
           <View

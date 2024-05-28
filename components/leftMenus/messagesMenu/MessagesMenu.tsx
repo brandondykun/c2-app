@@ -1,30 +1,67 @@
-import { Pressable, StyleSheet, View } from "react-native";
+import {
+  Pressable,
+  ScrollView,
+  StyleSheet,
+  TextInput,
+  View,
+} from "react-native";
 import Text from "../../ui/text/Text";
 import { COLORS } from "../../../colors/colors";
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import Input from "../../ui/input/Input";
 import Button from "../../ui/button/Button";
 import { Ionicons } from "@expo/vector-icons";
 import IconButton from "../../ui/iconButton/IconButton";
 import { useMapState } from "../../../context/mapState/MapStateContext";
+import { useActiveMission } from "../../../context/activeMissionContext/ActiveMissionContext";
+import { useAuthContext } from "../../../context/authContext/AuthContext";
+import { useTeamChatContext } from "../../../context/teamChatContext/TeamChatContext";
 
 type Tab = "TEAM" | "MISSION";
 
 const MessagesMenu = () => {
   const { dispatch } = useMapState();
+  const { activeTeam } = useActiveMission();
   const [activeTab, setActiveTab] = useState<Tab>("TEAM");
+  const { profile } = useAuthContext();
 
   const [text, setText] = useState("");
 
   const [inputFocused, setInputFocused] = useState(false);
+
+  const { sendMessage, messages, loading } = useTeamChatContext();
+
+  const scrollViewRef = useRef<ScrollView>(null!);
+  const inputRef = useRef<TextInput>(null!);
 
   const onTabPress = (tab: Tab) => {
     setActiveTab(tab);
   };
 
   const onSendPress = () => {
-    console.log("SENDING MESSAGE");
+    sendMessage(text, profile.id!, activeTeam?.id!);
+    setText("");
+    setInputFocused(false);
+    inputRef.current.blur();
   };
+
+  useEffect(() => {
+    // scroll to bottom with animation when new message is added
+    if (scrollViewRef.current) {
+      setTimeout(() => {
+        scrollViewRef.current.scrollToEnd({ animated: true });
+      }, 100);
+    }
+  }, [messages]);
+
+  useEffect(() => {
+    // scroll to bottom without animation when menu opens
+    if (scrollViewRef.current) {
+      setTimeout(() => {
+        scrollViewRef.current.scrollToEnd({ animated: false });
+      }, 0);
+    }
+  }, []);
 
   const onBackPress = () => {
     dispatch({ type: "TOGGLE_MESSAGES" });
@@ -39,7 +76,7 @@ const MessagesMenu = () => {
       )}
       <View style={s.labelAndButtons}>
         <Text style={s.menuLabel}>
-          {activeTab === "TEAM" ? "Team " : "Mission "}Chat
+          {activeTab === "TEAM" ? "Team Chat" : "Mission Chat"}
         </Text>
         <View style={s.chatTabs}>
           <Pressable onPress={() => onTabPress("TEAM")}>
@@ -73,7 +110,39 @@ const MessagesMenu = () => {
         </View>
       </View>
       <View style={s.messageTabContent}>
-        <View style={s.messagesContainer}></View>
+        <ScrollView
+          style={s.messagesView}
+          contentContainerStyle={s.messagesContainer}
+          ref={scrollViewRef}
+        >
+          {messages.length ? (
+            messages.map((message) => {
+              if (message.sender.id === profile.id) {
+                return (
+                  <View
+                    style={[s.baseMessageBubble, s.sentMessage]}
+                    key={message.id}
+                  >
+                    <Text>{message.text}</Text>
+                  </View>
+                );
+              } else {
+                return (
+                  <View key={message.id}>
+                    <Text style={{ paddingLeft: 12, color: COLORS.gray[300] }}>
+                      {message.sender.username}
+                    </Text>
+                    <View style={[s.baseMessageBubble, s.receivedMessage]}>
+                      <Text>{message.text}</Text>
+                    </View>
+                  </View>
+                );
+              }
+            })
+          ) : (
+            <Text style={s.noMessagesText}>No Messages</Text>
+          )}
+        </ScrollView>
         <View style={s.inputContainer}>
           <IconButton
             onPress={onBackPress}
@@ -93,6 +162,7 @@ const MessagesMenu = () => {
               onBlur={() => {
                 setInputFocused(false);
               }}
+              ref={inputRef}
             />
           </View>
           <Button label="Send" onPress={onSendPress} variant="accent" />
@@ -115,7 +185,6 @@ const s = StyleSheet.create({
     fontWeight: "bold",
     paddingLeft: 12,
     paddingVertical: 6,
-    // marginBottom: 24,
     color: COLORS.lime[500],
   },
   labelAndButtons: {
@@ -137,10 +206,16 @@ const s = StyleSheet.create({
     backgroundColor: COLORS.gray[800],
     padding: 4,
   },
-  messagesContainer: {
-    flex: 1,
-    backgroundColor: COLORS.gray[700],
+  messagesView: {
     borderRadius: 6,
+    backgroundColor: COLORS.gray[700],
+    flexGrow: 1,
+    overflow: "hidden",
+  },
+  messagesContainer: {
+    borderRadius: 6,
+    padding: 6,
+    gap: 4,
   },
   inputContainer: {
     flexDirection: "row",
@@ -163,5 +238,25 @@ const s = StyleSheet.create({
     alignItems: "center",
     borderRadius: 6,
     minHeight: 30,
+  },
+  baseMessageBubble: {
+    paddingVertical: 6,
+    paddingHorizontal: 12,
+    borderRadius: 20,
+    maxWidth: "70%",
+  },
+  sentMessage: {
+    backgroundColor: COLORS.sky[800],
+    alignSelf: "flex-end",
+  },
+  receivedMessage: {
+    backgroundColor: COLORS.lime[800],
+    alignSelf: "flex-start",
+  },
+  noMessagesText: {
+    marginTop: 30,
+    textAlign: "center",
+    fontSize: 18,
+    color: COLORS.gray[400],
   },
 });
