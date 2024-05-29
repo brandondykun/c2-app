@@ -85,6 +85,13 @@ export const LLtoMGRS = (coordinate: Coordinate): string => {
   return `${gridZoneDesignator} ${squareIdentifier} ${easting} ${northing}`;
 };
 
+export const LLtoMGRSNoSpaces = (coordinate: Coordinate): string => {
+  if (!coordinate) return "";
+
+  const point = mgrs.forward([coordinate.longitude, coordinate.latitude]);
+  return point;
+};
+
 export const MGRStoLL = (grid: string) => {
   // this should return a Coordinate type
   const point = mgrs.toPoint(grid);

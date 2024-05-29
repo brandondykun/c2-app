@@ -25,7 +25,17 @@ const useMissions = () => {
     fetchMissions();
   }, [fetchMissions]);
 
-  return { data, loading, error, refetch: fetchMissions };
+  const addMission = (mission: Mission) => {
+    setData((prev) => {
+      if (prev) {
+        return [...prev, mission];
+      } else {
+        return [mission];
+      }
+    });
+  };
+
+  return { data, loading, error, addMission, refetch: fetchMissions };
 };
 
 export default useMissions;

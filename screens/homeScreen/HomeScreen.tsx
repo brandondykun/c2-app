@@ -1,16 +1,15 @@
 import { Pressable, ScrollView, StyleSheet, View } from "react-native";
-import Button from "../../components/ui/button/Button";
 import useTypeSafeNavigation from "../../hooks/useTypeSafeNavigation/useTypeSafeNavigation";
 import { COLORS } from "../../colors/colors";
 import { FontAwesome, Entypo } from "@expo/vector-icons";
 import Text from "../../components/ui/text/Text";
 import DropdownSelect from "../../components/ui/dropdownSelect/DropdownSelect";
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 import { useActiveMission } from "../../context/activeMissionContext/ActiveMissionContext";
 import useMissions from "../../hooks/useMissions/useMissions";
-import useTeams from "../../hooks/useTeams/useTeams";
-import { Option } from "../../components/ui/dropdownSelect/DropdownSelect";
 import { useAuthContext } from "../../context/authContext/AuthContext";
+import { useIsFocused } from "@react-navigation/native";
+// import useTeams from "../../hooks/useTeams/useTeams";
 
 const HomeScreen = () => {
   const navigation = useTypeSafeNavigation();
@@ -20,11 +19,20 @@ const HomeScreen = () => {
   const { activeMission, activeTeam, setActiveTeam, activateMission } =
     useActiveMission();
 
-  const { error: missionsError, data: missionsData } = useMissions();
-  const { error: teamsError, data: teamsData } = useTeams();
+  const {
+    error: missionsError,
+    data: missionsData,
+    refetch: refetchMissions,
+  } = useMissions();
+  // const { error: teamsError, data: teamsData } = useTeams();
 
-  const [selectedTeam, setSelectedTeam] = useState(null);
-  const [selectedMission, setSelectedMission] = useState(null);
+  const isFocused = useIsFocused();
+
+  useEffect(() => {
+    if (missionsData && isFocused) {
+      refetchMissions();
+    }
+  }, [isFocused]);
 
   const handleGoToMapPress = () => {
     navigation.navigate("mapScreen");
@@ -75,7 +83,7 @@ const HomeScreen = () => {
         {selectedMissionToDisplay && missionOptions && (
           <DropdownSelect
             label="Mission"
-            selected={selectedMissionToDisplay}
+            selected={selectedMissionToDisplay.key}
             data={missionOptions}
             setSelected={handleSelectMission}
             defaultOption={missionOptions[0]}

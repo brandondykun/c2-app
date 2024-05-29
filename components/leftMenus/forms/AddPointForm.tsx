@@ -11,8 +11,7 @@ import { createPoint, updatePoint } from "../../../api/points";
 import { useActiveMission } from "../../../context/activeMissionContext/ActiveMissionContext";
 import { NewPoint, PointType, Point } from "../../../types/types";
 import { useMapGraphics } from "../../../context/mapGraphics/MapGraphicsContext";
-import { LLtoMGRS } from "../../../utils/utils";
-import Coordinate from "../../coordinate/Coordinate";
+import { LLtoMGRSNoSpaces } from "../../../utils/utils";
 import CoordinateConverter from "../../coordinateConverter/CoordinateConverter";
 
 const AddPointForm = () => {
@@ -96,7 +95,7 @@ const AddPointForm = () => {
         lng: state.tempCoordinate.longitude,
         mission: activeMission.id,
         team: activeTeam.id,
-        mgrs: LLtoMGRS({
+        mgrs: LLtoMGRSNoSpaces({
           latitude: state.tempCoordinate.latitude,
           longitude: state.tempCoordinate.longitude,
         }),
@@ -117,6 +116,10 @@ const AddPointForm = () => {
         description,
         lat: state.tempCoordinate.latitude,
         lng: state.tempCoordinate.longitude,
+        mgrs: LLtoMGRSNoSpaces({
+          latitude: state.tempCoordinate.latitude,
+          longitude: state.tempCoordinate.longitude,
+        }),
         mission: activeMission.id,
         team: activeTeam.id,
       } as Point;

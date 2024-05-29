@@ -6,7 +6,7 @@ import { MaterialIcons, Ionicons } from "@expo/vector-icons";
 export type Option = { key: number | string; value: string; disabled: boolean };
 
 type Props = {
-  selected?: Option;
+  selected?: number | null;
   setSelected: (
     value: any
   ) => void | React.Dispatch<React.SetStateAction<number | string>>;
