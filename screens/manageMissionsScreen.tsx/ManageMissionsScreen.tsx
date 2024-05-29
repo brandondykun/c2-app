@@ -14,12 +14,10 @@ import FullScreenModal from "../../components/ui/fullScreenModal/FullScreenModal
 import IconButton from "../../components/ui/iconButton/IconButton";
 import Loading from "../../components/ui/loading/Loading";
 import useTeams from "../../hooks/useTeams/useTeams";
-import DropdownSelect, {
-  Option,
-} from "../../components/ui/dropdownSelect/DropdownSelect";
+import DropdownSelect from "../../components/ui/dropdownSelect/DropdownSelect";
 
 const ManageMissionsScreen = () => {
-  const { error, data, loading, refetch } = useMissions();
+  const { error, data, loading, addMission, refetch } = useMissions();
   const {
     error: teamsError,
     data: teamsData,
@@ -36,7 +34,9 @@ const ManageMissionsScreen = () => {
   const defaultSelected = teamsData?.length
     ? { key: teamsData[0].id, value: teamsData[0].name, disabled: false }
     : null;
-  const [selectedTeam, setSelectedTeam] = useState<Option>(defaultSelected!);
+  const [selectedTeam, setSelectedTeam] = useState<number | null>(
+    defaultSelected ? defaultSelected.key : null
+  );
   const [selectedTeamError, setSelectedTeamError] = useState("");
 
   const [submitError, setSubmitError] = useState("");
@@ -79,8 +79,7 @@ const ManageMissionsScreen = () => {
       hasErrors = true;
       setNameError("Please enter a name.");
     }
-
-    if (!selectedTeam || !selectedTeam?.key) {
+    if (!selectedTeam) {
       hasErrors = true;
       setSelectedTeamError("Please select a team.");
     }
@@ -88,13 +87,10 @@ const ManageMissionsScreen = () => {
     if (hasErrors) return;
 
     setSubmitLoading(true);
-    const { error, data } = await createMission(
-      name,
-      about,
-      selectedTeam?.key!
-    );
+    const { error, data } = await createMission(name, about, selectedTeam!);
     if (data && !error) {
-      await refetch();
+      // TODO: need to get this added in a context or something so it updates on the home screen
+      addMission(data);
       toggleModal();
     } else {
       setSubmitError(
@@ -190,7 +186,7 @@ const ManageMissionsScreen = () => {
           label="Select Team"
           error={selectedTeamError}
           placeholder="Select a Team"
-          defaultOption={selectedTeam}
+          defaultOption={defaultSelected ? defaultSelected : undefined}
         />
         <Button
           label="Add Mission"
